@@ -204,15 +204,13 @@ export class SnakeGameObject
     }
 
     move() {
-        let incrementTail = false
+        let incrementTail = false;
         for (let x = 0; x < this.nodes.length; x++) {
             let newPosition = this.nextMoves[x];
             let node = this.nodes[x];
             if (x == 0) {
                 let applePos = this.apple.getCurrentPosition()
                 if (applePos.i === newPosition.i && applePos.j == newPosition.j) {
-                    this.moveApple();
-                    this.scene.incrementScore();
                     incrementTail = true;
                 }
             }
@@ -226,6 +224,8 @@ export class SnakeGameObject
         }
 
         if (incrementTail) {
+            this.moveApple();
+            this.scene.incrementScore();
             let {x, y} = this.getPosition(this.lastTailPosition.i, this.lastTailPosition.j);
             let newNode = new SnakeGameObjectPart(
                 new Phaser.GameObjects.Rectangle(this.scene, x, y, 40, 40, 0x6666ff), this.lastTailPosition.i, this.lastTailPosition.j,

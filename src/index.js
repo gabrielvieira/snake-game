@@ -1,3 +1,5 @@
+'use strict';
+
 import Phaser from 'phaser';
 import logoImg from './assets/logo.png';
 import {SnakeGameObject} from './objects/snake';
@@ -7,43 +9,65 @@ class SnakeGame extends Phaser.Scene
     constructor(config)
     {
         super(config);
+        this.score = 0;
+        this.gameOver = false;
         this.timer = 0;
     }
 
-    preload ()
-    {
-        this.load.image('logo', logoImg);
-    }
-      
     create ()
     {
         this.snake = new SnakeGameObject(this)
         this.snake.add()
-        // let r1 = this.add.rectangle(20, 200, 40, 40, 0x6666ff);
-        // this.physics.add.existing(r1);
-        // r1.body.velocity.x = 100;
-        // r1.body.velocity.y = 0;
-        // r1.body.bounce.x = 0;
-        // r1.body.bounce.y = 0;
-        // r1.body.collideWorldBounds = true;
+        this.scoreText = new Phaser.GameObjects.Text(this, 8, 8, 'score: 0', { fontSize: '16px', fill: '#ffffff' });
+        this.add.existing(this.scoreText)
+        this.triggerTimer = this.time.addEvent({
+            callback: this.timerEvent,
+            callbackScope: this,
+            delay: 150, // 1000 = 1 second
+            loop: true
+        });
     }
 
     update (time, delta)
     {
         let cursors = this.input.keyboard.createCursorKeys();
-        this.timer += delta;
-        while (this.timer > 100) {
-            this.timer -= 100;
-            this.snake.move();
+        if (this.gameOver) {
+            return;
         }
-        this.snake.handleCursor(cursors)
+        // this.timer += delta;
+        // while (this.timer > 300.0) {
+        //     this.timer -= 100;
+        //     this.snake.move()
+        // }
+        this.snake.handleCursor(cursors);
+    }
+
+    timerEvent() {
+        if (this.gameOver) {
+            return;
+        }
+        this.snake.move()
+    }
+
+    incrementScore() {
+        this.score += 1
+        this.scoreText.setText('Score: ' + this.score);
+    }
+
+    setGameOver() {
+        this.gameOver = true;
+        console.log("game over")
+    }
+
+    restartGame() {
+        this.snake.reset()
     }
 }
 
 const config = {
     type: Phaser.AUTO,
-    width: 810,
-    height: 630,
+    width: 815,
+    height: 635,
     physics: {
         default: 'arcade',
         arcade: {
@@ -54,4 +78,4 @@ const config = {
     backgroundColor: '#000000'
 };
 
-new Phaser.Game(config);
+let game = new Phaser.Game(config);
